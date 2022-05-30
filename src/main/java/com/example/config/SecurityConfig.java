@@ -3,20 +3,25 @@ package com.example.config;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-@SuppressWarnings("deprecation")
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
+	
+	@Autowired
+	@Qualifier("UserDetailsServiceImpl")
+	private UserDetailsService userDetailsService;
 	
 	 //パスワードエンコーダーのBean定義
     @Bean
@@ -85,11 +90,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
      // ログイン処理時のユーザー情報を、DBから取得する
-     auth.jdbcAuthentication()
+    /*auth.jdbcAuthentication()
               .dataSource(dataSource)
               .usersByUsernameQuery(USER_SQL) //ユーザーの取得
               .authoritiesByUsernameQuery(ROLE_SQL) //ロールの取得
-              .passwordEncoder(passwordEncoder()); //パスワードの復号
+              .passwordEncoder(passwordEncoder()); //パスワードの復号*/
+    	
+    	auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
         
 
     }
