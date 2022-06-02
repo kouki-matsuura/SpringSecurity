@@ -68,13 +68,14 @@ public class AppUserDetails implements UserDetails {
 
 	@Override
 	public boolean isCredentialsNonExpired() {
+		return true;
 		//パスワードの有効期限のチェック
-		if (this.passUpdateDate.after(new Date())){
+		/*if (this.passUpdateDate.after(new Date())){
 			//現在の日付よりも後なら有効
 			return true;
 		} else {
 			return false;
-		}
+		}*/
 	}
 	
 	@Override

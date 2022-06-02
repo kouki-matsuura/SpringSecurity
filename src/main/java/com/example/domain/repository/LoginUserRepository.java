@@ -40,6 +40,13 @@ public class LoginUserRepository {
 			+ " ON user_role.role_id = role.role_id"
 			+ " WHERE m_user.user_id = ?";
 	
+	//パスワードと期限を更新するSQL
+	private static final String UPDATE_PASSWORD_SQL = 
+			"UPDATE m_user"
+			+ " SET password=?,"
+			+ " pass_update_date = ?"
+			+ " WHERE user_id = ?";
+	
 	//ユーザー情報を取得してUserDetailsを生成するメソッド
 	public UserDetails selectOne(String userId) {
 		//select実行(ユーザーの取得)
@@ -107,5 +114,12 @@ public class LoginUserRepository {
 		
 		return user;
 		
+	}
+	
+	//パスワードと期限を更新するメソッド
+	public int updatePassword(String userId, String password, Date passwordUpdateDate) {
+		//パスワード更新
+		int result = jdbc.update(UPDATE_PASSWORD_SQL, password, passwordUpdateDate, userId);
+		return result;
 	}
 }
