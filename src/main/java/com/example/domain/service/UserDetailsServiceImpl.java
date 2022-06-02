@@ -12,7 +12,10 @@ import org.springframework.stereotype.Component;
 
 import com.example.domain.repository.LoginUserRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component("UserDetailsServiceImpl")
+@Slf4j
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Autowired
@@ -20,6 +23,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	
 	@Autowired
 	private PasswordEncoder encoder;
+	
+	//ログイン失敗の上限回数
+	private static final int LOGIN_MISS_LIMIT = 3;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -39,5 +45,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		//リポジトリからパスワード更新
 		repository.updatePassword(userId, encryptPass, date);
 		
+	}
+	
+	//失敗回数と有効・無効フラグを更新する
+	public void updateUnlock(String userId, int loginMissTime) {
+		//有効・無効フラグ(有効)
+		boolean unlock = true;
+		
+		if (loginMissTime >= LOGIN_MISS_LIMIT) {
+			unlock = false;
+			log.info(userId + "をロックします");
+		}
+		
+		//リポジトリからパスワード更新
+		repository.updateUnlock(userId, loginMissTime, unlock);
 	}
 }
